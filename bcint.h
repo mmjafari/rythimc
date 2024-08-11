@@ -14,6 +14,7 @@ typedef struct {
   int vrpsp; // space between repeats
   int vblen; // beat length
   int vprog; // midi program
+  int vplch; // place holder, 3 bytes
 } voice;
 
 typedef struct{
@@ -161,20 +162,22 @@ void add_meta_event(MidiTrack* track, uint8_t type, const uint8_t* data, uint32_
 }
 
 void note_maker(__uint128_t vcon, voice *v){
-  v->vnote = (vcon & (__uint128_t)0xFF000000000000000000000000000000) >> 120;
-  v->vstrt = (vcon & (__uint128_t)0x00FFFF00000000000000000000000000) >> 104;
-  v->vend  = (vcon & (__uint128_t)0x000000FFFF0000000000000000000000) >> 88;
-  v->vspce = (vcon & (__uint128_t)0x0000000000FFFF000000000000000000) >> 72;
-  v->voffs = (vcon & (__uint128_t)0x00000000000000FFFF00000000000000) >> 56;
-  v->vreps = (vcon & (__uint128_t)0x000000000000000000FFFF0000000000) >> 40;
-  v->vrpsp = (vcon & (__uint128_t)0x0000000000000000000000FFFF000000) >> 24;
-  v->vblen = (vcon & (__uint128_t)0x00000000000000000000000000F00000) >> 20;
-  v->vprog = (vcon & (__uint128_t)0x000000000000000000000000000FF000) >> 12;
-  printf("note:%d\nstart:%d\nend:%d\nspace:%d\noffset:%d\nplace holder 2:%d\n",\
+  v->vnote = (vcon >> 120) &   0xFF;
+  v->vstrt = (vcon >> 104) & 0xFFFF;
+  v->vend  = (vcon >> 88 ) & 0xFFFF;
+  v->vspce = (vcon >> 72 ) & 0xFFFF;
+  v->voffs = (vcon >> 56 ) & 0xFFFF;
+  v->vreps = (vcon >> 40 ) & 0xFFFF;
+  v->vrpsp = (vcon >> 24 ) & 0xFFFF;
+  v->vblen = (vcon >> 20 ) &    0xF;
+  v->vprog = (vcon >> 12 ) &   0xFF;
+  v->vplch = (vcon >> 0  ) &  0xFFF;
+  printf("note: %d\nstart: %d\nend: %d\nspace: %d\noffset: %d\nprogram: %d\nPlaceh: %d\n",\
          v->vnote,\
          v->vstrt,\
          v->vend,\
          v->vspce,\
          v->voffs,\
-         v->vprog);
+         v->vprog,\
+         v->vplch);
 }
