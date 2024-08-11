@@ -13,7 +13,8 @@ int main( int argc, char *argv[]){
   midi_file.division = 480; // default
   int vcount = 0;
   int bpm = 220; //dummy
-  voice **vlist = (voice **)malloc(64 * sizeof(voice));
+  //voice **vlist = (voice **)malloc(64 * sizeof(voice));
+  voice *vlist = (voice *)malloc(256 * sizeof(voice));
   __uint128_t lnote = 0;
   unsigned char li[2]; 
   unsigned char le;
@@ -41,10 +42,11 @@ int main( int argc, char *argv[]){
     case 0x4e:
       for (int i = 0; i < 8; i++){
         fread(&li, 1, 2, input);
-        if (li == NULL) {break;}
         lnote = (lnote << 16) + (li[0] << 8) + li[1];
       }
-      note_maker(lnote, vlist[vcount]);
+      printf("%d\n", vcount);
+      if (&vlist[vcount]){note_maker(lnote, &vlist[vcount]);}
+      printf("%d\n", vlist[vcount].vend);
       vcount++;
       break;
     case 0xFF:
